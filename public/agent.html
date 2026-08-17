@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComboPads — Agent Earnings Hub</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0f172a; --secondary: #3b82f6; --accent: #10b981; --bg: #f8fafc; --text: #1e293b; --white: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; }
+
+        header { background: var(--primary); color: white; padding: 25px 40px; text-align: center; }
+        .container { max-width: 600px; margin: -40px auto 60px; padding: 0 20px; }
+
+        .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; text-align: center; margin-bottom: 25px; }
+        .wallet-amt { font-size: 3.5rem; font-weight: 800; color: var(--accent); margin: 15px 0; letter-spacing: -2px; }
+
+        .ref-box { background: #f1f5f9; padding: 20px; border-radius: 20px; margin: 25px 0; border: 2px dashed #cbd5e1; }
+        .ref-code { font-size: 1.8rem; font-weight: 800; color: var(--secondary); letter-spacing: 2px; }
+
+        .btn { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        .btn-p { background: var(--secondary); color: white; }
+        .btn-whatsapp { background: #25d366; color: white; }
+
+        .stat-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f1f5f9; font-weight: 600; }
+        input { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 15px; margin-bottom: 15px; outline: none; text-align: center; font-size: 1.1rem; }
+
+        #authArea { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div id="authArea">
+        <div class="card" style="width: 400px;">
+            <h1>Agent Login</h1>
+            <p style="color:#64748b; margin-bottom:25px;">Enter your phone to track earnings.</p>
+            <input type="text" id="aPhone" placeholder="2547XXXXXXXX">
+            <button class="btn btn-p" onclick="login()">Enter Dashboard</button>
+            <p style="margin-top:20px; font-size:0.9rem;">Want to become an agent? <br><a href="onboard.html" style="color:var(--secondary); font-weight:800;">Register Here</a></p>
+        </div>
+    </div>
+
+    <div id="mainArea" style="display:none;">
+        <header>
+            <h1 style="letter-spacing:-1px;">Agent Empire Hub</h1>
+            <p style="opacity:0.8;">You grow the network, we pay the coins.</p>
+        </header>
+
+        <div class="container">
+            <div class="card">
+                <label style="font-weight:800; color:#94a3b8; text-transform:uppercase;">Current Balance</label>
+                <div class="wallet-amt">KSh <span id="balance">0</span></div>
+                <button class="btn btn-p" onclick="alert('Withdrawals process every Friday via M-Pesa.')">Request Withdrawal</button>
+            </div>
+
+            <div class="card">
+                <h3>Your Recruitment Tool</h3>
+                <p style="color:#64748b; margin-top:10px;">Give this code to Landlords. When they register, you earn KSh 200.</p>
+                <div class="ref-box">
+                    <div class="ref-code" id="refCodeDisplay">REF-XXXX</div>
+                </div>
+                <button class="btn btn-whatsapp" onclick="shareAgent()">
+                    <i class="fab fa-whatsapp"></i> Invite Landlords on WhatsApp
+                </button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom:20px;">Your Performance</h3>
+                <div class="stat-row"><span>Total Referrals</span><span id="refCount">0</span></div>
+                <div class="stat-row"><span>Active Plots</span><span id="plotCount">0</span></div>
+                <div class="stat-row"><span>Commission Rate</span><span>KSh 200 / Plot</span></div>
+            </div>
+
+            <button class="btn" style="background:none; color:#64748b; text-decoration:underline;" onclick="location.reload()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        let agentData = null;
+
+        async function login() {
+            const phone = document.getElementById('aPhone').value.trim();
+            // In a real system, we'd do a full auth. For this "Ghetto Speed" launch, we fetch by phone.
+            const res = await fetch(`/api/tenant/me`, { headers: { Authorization: `Bearer ${phone}` } }); // Mocking auth via phone for demo
+            // Real logic: We'll update the server to handle this specifically.
+            // For now, let's simulate the UI for your team.
+            document.getElementById('authArea').style.display = 'none';
+            document.getElementById('mainArea').style.display = 'block';
+
+            // Dummy data for your morning demo
+            document.getElementById('refCodeDisplay').innerText = 'REF-' + phone.slice(-4).toUpperCase();
+            document.getElementById('balance').innerText = '1,400';
+            document.getElementById('refCount').innerText = '7';
+            document.getElementById('plotCount').innerText = '3';
+        }
+
+        function shareAgent() {
+            const code = document.getElementById('refCodeDisplay').innerText;
+            const text = encodeURIComponent(`Hi! I'm using ComboPads to manage my properties and find tenants without brokers. Use my referral code ${code} to get started: https://combopads.onrender.com/onboard.html`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`);
+        }
+    </script>
+</body>
+</html>
