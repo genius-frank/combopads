@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComboPads Empire — Premium Real Estate</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0f172a; --secondary: #3b82f6; --accent: #10b981; --gold: #f59e0b; --bg: #f8fafc; --text: #1e293b; --white: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; scroll-behavior: smooth; }
+        body { background-color: var(--bg); color: var(--text); }
+
+        nav { background: var(--white); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.6rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--secondary); }
+        .btn-dark { background: var(--primary); color: white; padding: 12px 24px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 0.9rem; }
+
+        .hero { background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center; padding: 100px 20px 160px; text-align: center; color: white; }
+        .hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -2px; }
+
+        .search-container { max-width: 1000px; margin: -60px auto 0; padding: 0 20px; position: relative; z-index: 10; }
+        .search-bar { background: var(--white); padding: 35px; border-radius: 30px; box-shadow: 0 25px 60px rgba(0,0,0,0.12); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: flex-end; }
+        .s-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; }
+        .s-group input, .s-group select { width: 100%; padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; border-radius: 15px; outline: none; font-size: 1rem; }
+        .btn-search { background: var(--secondary); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; cursor: pointer; height: 58px; font-size: 1rem; }
+
+        .neighborhoods { display: flex; justify-content: center; gap: 12px; margin: 50px 0; flex-wrap: wrap; }
+        .n-tag { background: white; padding: 10px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
+        .n-tag:hover { border-color: var(--secondary); color: var(--secondary); transform: translateY(-3px); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 35px; }
+
+        .h-card { background: var(--white); border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: 0.4s; position: relative; border: 1px solid #f1f5f9; }
+        .h-card:hover { transform: translateY(-10px); }
+        .h-img { width: 100%; height: 240px; object-fit: cover; }
+        .h-info { padding: 25px; }
+        .h-price { font-size: 1.6rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+        .h-title { font-size: 1.3rem; color: var(--primary); margin-bottom: 10px; font-weight: 700; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-sm { padding: 12px; border-radius: 12px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+        .btn-view { background: var(--primary); color: white; }
+        .btn-inq { background: var(--secondary); color: white; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo"><i class="fas fa-cube"></i> Combo<span>Pads</span></a>
+        <div class="nav-actions">
+            <a href="onboard.html" class="btn-ghost" style="text-decoration:none; font-weight:700; margin-right:15px;">List Property</a>
+            <a href="tenant.html" class="btn-dark">Sign In</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Your Future, Better Located.</h1>
+        <p>The premium marketplace for rentals and sales across Kenya's most elite neighborhoods.</p>
+    </header>
+
+    <div class="search-container">
+        <div class="search-bar">
+            <div class="s-group"><label>Where</label><input type="text" id="sLoc" placeholder="e.g. Westlands"></div>
+            <div class="s-group"><label>Type</label><select id="sCat"><option value="ALL">All Categories</option><option value="HOUSE">Houses</option><option value="LAND">Lands</option></select></div>
+            <div class="s-group"><label>Budget</label><input type="number" id="sMax" placeholder="KSh"></div>
+            <button class="btn-search" onclick="load()">Search</button>
+        </div>
+        <div class="neighborhoods">
+            <div class="n-tag" onclick="quickSearch('Roysambu')">Roysambu</div>
+            <div class="n-tag" onclick="quickSearch('Westlands')">Westlands</div>
+            <div class="n-tag" onclick="quickSearch('Kilimani')">Kilimani</div>
+            <div class="n-tag" onclick="quickSearch('Karen')">Karen</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grid" id="mainGrid"></div>
+    </div>
+
+    <script>
+        function quickSearch(l) { document.getElementById('sLoc').value = l; load(); }
+        async function load() {
+            const grid = document.getElementById('mainGrid');
+            const loc = document.getElementById('sLoc').value;
+            const max = document.getElementById('sMax').value;
+            const res = await fetch(`/api/listings?search=${loc}&maxPrice=${max}`);
+            const data = await res.json();
+            grid.innerHTML = '';
+            data.forEach(l => {
+                grid.innerHTML += `
+                    <div class="h-card">
+                        <img src="${l.cover_photo || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'}" class="h-img">
+                        <div class="h-info">
+                            <div class="h-price">KSh ${Number(l.price).toLocaleString()}</div>
+                            <h3 class="h-title">${l.title}</h3>
+                            <p style="color:#64748b; font-size:0.85rem;">📍 ${l.location}</p>
+                            <div class="btn-group">
+                                <button class="btn-sm btn-view" onclick="location.href='listing.html?id=${l.id}'">Explore</button>
+                                <button class="btn-sm btn-inq" onclick="location.href='listing.html?id=${l.id}&ask=1'">Inquire</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        load();
+    </script>
+</body>
+</html>

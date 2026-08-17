@@ -1,0 +1,18 @@
+{
+  "name": "combopads",
+  "version": "1.0.0",
+  "description": "Multi-tenant real estate platform for house hunting and property management.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "bcryptjs": "^2.4.3",
+    "path": "^0.12.7"
+  },
+  "author": "Francis Empire",
+  "license": "ISC"
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComboPads — Partner Registration</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0f172a; --secondary: #3b82f6; --bg: #f8fafc; --white: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: #1e293b; line-height: 1.6; }
+
+        .hero { background: var(--primary); color: white; padding: 80px 24px; text-align: center; }
+        .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1.5px; }
+
+        .auth-card { background: var(--white); max-width: 500px; margin: -60px auto 100px; padding: 45px; border-radius: 30px; box-shadow: 0 25px 60px rgba(0,0,0,0.1); position: relative; z-index: 100; }
+        h2 { font-size: 1.8rem; text-align: center; margin-bottom: 30px; color: var(--primary); font-weight: 800; }
+
+        label { display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 15px; margin-bottom: 20px; font-size: 1rem; outline: none; transition: 0.2s; background: #f8fafc; }
+        input:focus { border-color: var(--secondary); background: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+        .btn-reg { width: 100%; padding: 18px; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; cursor: pointer; background: var(--secondary); color: white; transition: 0.3s; }
+        .btn-reg:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2); }
+
+        .footer-link { text-align: center; margin-top: 25px; font-size: 0.9rem; color: #64748b; }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <h1>Build Your Real Estate Empire</h1>
+        <p>Join the world's most advanced property management platform today.</p>
+    </header>
+
+    <div class="auth-card">
+        <h2>Partner Signup</h2>
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="e.g. Francis Onyango">
+
+        <label>Phone Number</label>
+        <input type="text" id="regPhone" placeholder="2547XXXXXXXX">
+
+        <label>I am a...</label>
+        <select id="regRole">
+            <option value="LANDLORD">Property Owner</option>
+            <option value="AGENT">Real Estate Agent</option>
+        </select>
+
+        <label>Business Name (Optional)</label>
+        <input type="text" id="regBiz" placeholder="e.g. Onyango Properties">
+
+        <label>Create Password</label>
+        <input type="password" id="regPass">
+
+        <label>Verification Key</label>
+        <input type="password" id="regKey" placeholder="Enter 'baraka-setup-2026'">
+
+        <button class="btn-reg" id="regBtn" onclick="handleRegister()">Create Account & Enter</button>
+
+        <div class="footer-link">
+            Already have an account? <a href="admin.html" style="color:var(--secondary); font-weight:800; text-decoration:none;">Log in here</a>
+        </div>
+    </div>
+
+    <script>
+        async function handleRegister() {
+            const btn = document.getElementById('regBtn');
+            const payload = {
+                name: document.getElementById('regName').value.trim(),
+                phone: document.getElementById('regPhone').value.trim(),
+                role: document.getElementById('regRole').value,
+                businessName: document.getElementById('regBiz').value.trim(),
+                password: document.getElementById('regPass').value,
+                setupKey: document.getElementById('regKey').value.trim(),
+                email: ''
+            };
+
+            if(!payload.name || !payload.phone || !payload.password || !payload.setupKey) {
+                return alert('Please fill in all required fields.');
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Creating Empire...';
+
+            try {
+                const res = await fetch('/api/auth/register-partner', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Registration failed.');
+
+                // CRITICAL: Save session and redirect
+                localStorage.setItem('at', data.token);
+                localStorage.setItem('an', payload.name);
+                localStorage.setItem('empire_ready', 'true');
+
+                window.location.href = 'admin.html';
+            } catch (err) {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerText = 'Create Account & Enter';
+            }
+        }
+    </script>
+</body>
+</html>

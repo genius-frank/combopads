@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComboPads — Partner Command Center</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0f172a; --secondary: #3b82f6; --accent: #10b981; --bg: #f8fafc; --text: #1e293b; --white: #ffffff; --border: #e2e8f0; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
+
+        aside { width: 280px; background: var(--primary); color: white; padding: 35px 25px; display: flex; flex-direction: column; height: 100vh; flex-shrink: 0; z-index: 100; }
+        .logo { font-size: 1.6rem; font-weight: 800; margin-bottom: 50px; color: white; text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .logo span { color: var(--secondary); }
+        .nav-item { padding: 14px 18px; border-radius: 14px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-weight: 600; color: #94a3b8; transition: 0.3s; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: var(--secondary); color: white; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); }
+
+        main { flex: 1; padding: 40px; overflow-y: auto; height: 100vh; position: relative; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .user-profile { background: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-weight: 700; border: 1px solid var(--border); }
+
+        .content-card { background: white; padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; margin-bottom: 30px; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 35px; }
+        .stat-card { background: white; padding: 30px; border-radius: 20px; border: 1px solid var(--border); }
+        .stat-card label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        .stat-card h2 { font-size: 2.5rem; margin-top: 10px; color: var(--primary); }
+
+        .btn { padding: 14px 24px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-p { background: var(--secondary); color: white; }
+        .btn-p:hover { transform: translateY(-2px); background: #2563eb; }
+        .btn-add { background: var(--primary); color: white; margin-bottom: 25px; }
+        .btn-whatsapp { background: #25d366; color: white; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 20px; font-size: 0.8rem; color: #94a3b8; border-bottom: 2px solid #f8fafc; text-transform: uppercase; }
+        td { padding: 20px; border-bottom: 1px solid #f8fafc; font-size: 1rem; color: var(--text); }
+
+        input, select, textarea { width: 100%; padding: 15px; border: 1px solid var(--border); background: #f8fafc; border-radius: 14px; margin-bottom: 20px; outline: none; font-size: 1rem; }
+        #authScreen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+
+        .id-badge { background: #fff7ed; color: #c2410c; padding: 8px 15px; border-radius: 10px; font-family: monospace; font-weight: 800; font-size: 0.9rem; border: 1px dashed #f59e0b; display: inline-block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div id="authScreen">
+        <div class="content-card" style="width: 450px; text-align: center;">
+            <h1>Partner Access</h1>
+            <input type="text" id="aPh" placeholder="Phone 254...">
+            <input type="password" id="aPw" placeholder="Password">
+            <button class="btn btn-p" style="width: 100%; justify-content:center;" onclick="login()">Enter the Empire</button>
+            <p style="margin-top:20px;">New? <a href="onboard.html" style="color:var(--secondary); font-weight:800;">Register Here</a></p>
+        </div>
+    </div>
+
+    <aside id="side" style="display:none;">
+        <a href="index.html" class="logo"><i class="fas fa-city"></i> Combo<span>Pads</span></a>
+        <div class="nav-item active" id="nav_dash" onclick="sw('dash')"><i class="fas fa-chart-line"></i> Dashboard</div>
+        <div class="nav-item" id="nav_leads" onclick="sw('leads')"><i class="fas fa-bullhorn"></i> Sales Leads</div>
+        <div class="nav-item" id="nav_props" onclick="sw('props')"><i class="fas fa-hotel"></i> My Properties</div>
+        <div class="nav-item" id="nav_apps" onclick="sw('apps')"><i class="fas fa-file-contract"></i> Applications</div>
+        <div class="nav-item" id="nav_repairs" onclick="sw('repairs')"><i class="fas fa-tools"></i> Repairs</div>
+        <div class="nav-item" id="nav_finance" onclick="sw('finance')"><i class="fas fa-wallet"></i> My Finance</div>
+        <div class="nav-item" onclick="logout()" style="margin-top:auto;"><i class="fas fa-power-off"></i> Logout</div>
+    </aside>
+
+    <main id="portal" style="display:none;">
+        <header><h2 id="vT">Dashboard</h2><div class="user-profile" id="uN">Admin</div></header>
+        <div id="vArea"></div>
+    </main>
+
+    <script>
+        let cur = 'dash'; let selId = null; const KEY = 'at';
+
+        async function login() {
+            const b = { phone:document.getElementById('aPh').value.trim(), password:document.getElementById('aPw').value };
+            const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) });
+            const d = await res.json();
+            if(res.ok) { localStorage.setItem(KEY, d.token); localStorage.setItem('an', d.name); init(); }
+            else alert('Invalid Login: ' + d.error);
+        }
+
+        function init() {
+            if(!localStorage.getItem(KEY)) return;
+            document.getElementById('authScreen').style.display='none';
+            document.getElementById('side').style.display='flex';
+            document.getElementById('portal').style.display='block';
+            document.getElementById('uN').innerText = localStorage.getItem('an');
+            sw('dash');
+        }
+
+        function sw(t, id = null) {
+            cur = t; if(id) selId = id;
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+            if(document.getElementById('nav_'+t)) document.getElementById('nav_'+t).classList.add('active');
+            render();
+        }
+
+        async function render() {
+            const area = document.getElementById('vA');
+            const h = { headers: { Authorization: `Bearer ${localStorage.getItem(KEY)}` } };
+            area.innerHTML = '<div style="text-align:center; padding:100px;"><i class="fas fa-circle-notch fa-spin fa-3x" style="color:var(--secondary);"></i><p style="margin-top:10px;">Loading empire data...</p></div>';
+            document.getElementById('vT').innerText = cur.toUpperCase();
+
+            try {
+                if(cur === 'dash') {
+                    const s = await (await fetch('/api/admin/stats', h)).json();
+                    area.innerHTML = `<div class="stat-grid"><div class="stat-card"><label>Occupancy</label><h2>${Math.round((s.occupied_units/s.total_units)*100)||0}%</h2></div><div class="stat-card"><label>Leads</label><h2>${s.new_applications||0}</h2></div><div class="stat-card"><label>Repairs</label><h2 style="color:red">${s.open_tickets||0}</h2></div></div>`;
+                }
+                else if(cur === 'leads') {
+                    const l = await (await fetch('/api/admin/inquiries', h)).json();
+                    area.innerHTML = `<div class="content-card"><table><tr><th>Hunter</th><th>Listing</th><th>Action</th></tr>${l.map(i=>`<tr><td><strong>${i.name}</strong><br><small>${i.phone}</small></td><td>${i.listing_title}</td><td><button class="btn btn-whatsapp" onclick="window.open('https://wa.me/${i.phone}')">WhatsApp</button></td></tr>`).join('') || '<tr><td colspan="3" style="text-align:center; padding:50px;">No leads yet.</td></tr>'}</table></div>`;
+                }
+                else if(cur === 'props') {
+                    const p = await (await fetch('/api/admin/properties', h)).json();
+                    area.innerHTML = `<button class="btn btn-add" onclick="toggle('fP')">+ Add Property</button><div id="fP" class="content-card" style="display:none"><h3>Register Plot</h3><input id="pn" placeholder="Name"><input id="pl" placeholder="Location"><button class="btn btn-p" onclick="saveP()">Save</button></div><div class="stat-grid">${p.map(i=>`<div class="stat-card" style="text-align:center;"><h3>${i.name}</h3><div style="margin-bottom:15px;"><small>TENANT LOGON ID:</small><br><span class="id-badge">${i.id}</span></div><p>📍 ${i.location}</p><button class="btn btn-p" style="width:100%" onclick="go('units', '${i.id}')">Manage Units</button></div>`).join('')}</div>`;
+                }
+                else if(cur === 'units') {
+                    const u = await (await fetch(`/api/admin/properties/${selId}/units`, h)).json();
+                    area.innerHTML = `
+                        <button class="btn" style="margin-bottom:20px;" onclick="sw('props')">← Back</button>
+                        <div class="content-card" style="border:2px solid #3b82f6;">
+                            <h3>🚀 Bulk Generate Rooms</h3>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px;">
+                                <input id="bc" type="number" placeholder="How many rooms?">
+                                <input id="bs" type="number" placeholder="Starting Room No.">
+                            </div>
+                            <input id="br" type="number" placeholder="Rent (KSh)">
+                            <button class="btn btn-p" style="width:100%; justify-content:center;" onclick="bulkU()">Generate Now</button>
+                        </div>
+                        <div class="content-card">
+                            <table><tr><th>No.</th><th>Rent</th><th>Status</th><th>Market</th></tr>${u.map(i=>`<tr><td><strong>${i.unit_number}</strong></td><td>KSh ${Number(i.monthly_rent).toLocaleString()}</td><td>${i.status}</td><td><button class="btn btn-p" style="padding:8px 15px; font-size:0.8rem;" onclick="sw('post', '${i.id}')">Post</button></td></tr>`).join('')}</table>
+                        </div>
+                    `;
+                }
+                else if(cur === 'post') {
+                    area.innerHTML = `<div class="content-card"><h3>Publish Listing</h3><input id="lt" placeholder="Ad Title"><input id="lp" type="number" placeholder="Price"><textarea id="ld" placeholder="Description"></textarea><button class="btn btn-p" onclick="pub()">Go Live</button></div>`;
+                }
+                else if(cur === 'apps') {
+                    const a = await (await fetch('/api/admin/applications', h)).json();
+                    area.innerHTML = `<div class="content-card"><table><tr><th>Applicant</th><th>Unit No.</th><th>Action</th></tr>${a.map(i=>`<tr><td><strong>${i.full_name}</strong></td><td>${i.unit_number}</td><td><button class="btn btn-p" onclick="moveIn('${i.id}')">Approve</button></td></tr>`).join('') || '<tr><td colspan="3" style="text-align:center; padding:50px;">No applications</td></tr>'}</table></div>`;
+                }
+                else if(cur === 'finance') {
+                    const f = await (await fetch('/api/admin/financials', h)).json();
+                    const p = f.expected > 0 ? Math.min(100, Math.round((f.collected/f.expected)*100)) : 0;
+                    area.innerHTML = `
+                        <div class="content-card" style="text-align:center; padding:60px 40px;">
+                            <label>Monthly Progress</label>
+                            <h1 style="font-size:3rem; margin:15px 0;">${p}% Collected</h1>
+                            <div style="height:15px; background:#f1f5f9; border-radius:10px; margin:20px 0; overflow:hidden; border:1px solid #e2e8f0;">
+                                <div style="height:100%; background:linear-gradient(to right, var(--secondary), var(--accent)); width:${p}%"></div>
+                            </div>
+                            <p style="font-weight:700; color:#64748b;">KSh ${f.collected.toLocaleString()} / ${f.expected.toLocaleString()} TARGET</p>
+                            <button class="btn btn-p" style="margin-top:30px;" onclick="sendReminders()">📢 Send Automatic Rent Reminders</button>
+                        </div>
+                        <div class="content-card">
+                            <h3>Arrears (Not Paid)</h3>
+                            <table><tr><th>Tenant</th><th>Phone</th><th>Amount</th></tr>
+                            ${f.unpaidList.map(u=>`<tr><td><strong>${u.full_name}</strong></td><td>${u.phone}</td><td style="color:red; font-weight:bold;">KSh ${u.monthly_rent.toLocaleString()}</td></tr>`).join('') || '<tr><td>All paid.</td></tr>'}
+                            </table>
+                        </div>
+                    `;
+                }
+            } catch(e) { area.innerHTML = '<div class="content-card" style="text-align:center; color:red;"><h3>System Error</h3><p>Could not load view. Please refresh.</p></div>'; }
+        }
+
+        async function saveP() { await fetch('/api/admin/properties', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({name:document.getElementById('pn').value, location:document.getElementById('pl').value})}); sw('props'); }
+        async function bulkU() { await fetch(`/api/admin/properties/${selId}/bulk-units`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({count:document.getElementById('bc').value, startNumber:document.getElementById('bs').value, rent:document.getElementById('br').value})}); alert('Generated!'); sw('units', selId); }
+        async function pub() { await fetch(`/api/admin/units/${selId}/listings`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({title:document.getElementById('lt').value, price:document.getElementById('lp').value, description:document.getElementById('ld').value})}); alert('Live!'); sw('props'); }
+        async function moveIn(id) { await fetch(`/api/admin/applications/${id}/move-in`, { method:'POST', headers:{Authorization:`Bearer ${localStorage.getItem(KEY)}`} }); render(); }
+        async function fix(id) { await fetch(`/api/admin/maintenance/${id}/resolve`, { method:'POST', headers:{Authorization:`Bearer ${localStorage.getItem(KEY)}`} }); render(); }
+        async function sendReminders() {
+            const res = await fetch('/api/admin/send-reminders', { method:'POST', headers:{Authorization:`Bearer ${localStorage.getItem(KEY)}`} });
+            const d = await res.json();
+            alert(`Emails/SMS sent to ${d.count} tenants!`);
+        }
+        function toggle(id) { const e=document.getElementById(id); e.style.display=e.style.display==='none'?'block':'none'; }
+        function logout() { localStorage.clear(); location.reload(); }
+        init();
+    </script>
+</body>
+</html>

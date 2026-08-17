@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComboPads — Official Booking</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0f172a; --secondary: #3b82f6; --accent: #10b981; --bg: #0f172a; --text: #1e293b; --white: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .card { background: var(--white); width: 100%; max-width: 500px; padding: 50px; border-radius: 35px; box-shadow: 0 30px 100px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+        .progress-bar { position: absolute; top: 0; left: 0; height: 8px; background: var(--accent); transition: width 0.4s; }
+
+        h2 { font-size: 2rem; color: var(--primary); margin-bottom: 10px; letter-spacing: -1px; }
+        p.sub { color: #64748b; font-size: 0.95rem; margin-bottom: 30px; }
+
+        label { display: block; font-size: 0.75rem; font-weight: 800; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 15px; margin-bottom: 20px; font-size: 1rem; outline: none; transition: 0.2s; background: #f8fafc; }
+        input:focus { border-color: var(--secondary); background: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+        .btn { width: 100%; padding: 18px; background: var(--secondary); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .verify-code { text-align: center; letter-spacing: 10px; font-size: 2rem; font-weight: 800; color: var(--primary); border: 2px dashed #cbd5e1; }
+        .success-icon { font-size: 5rem; color: var(--accent); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="progress-bar" id="progressBar" style="width: 33%;"></div>
+
+        <!-- Step 1: Details -->
+        <div class="step active" id="step1">
+            <h2>Complete Booking</h2>
+            <p class="sub">You are one step away from securing your new home.</p>
+
+            <label>Full Name</label>
+            <input type="text" id="aName" placeholder="As per National ID">
+
+            <label>Phone Number</label>
+            <input type="text" id="aPhone" placeholder="e.g. 2547XXXXXXXX">
+
+            <label>Referral Code (Optional)</label>
+            <input type="text" id="aRef" placeholder="e.g. REF-XYZ">
+
+            <button class="btn" id="subBtn" onclick="submitBooking()">Submit & Verify</button>
+        </div>
+
+        <!-- Step 2: Verify -->
+        <div class="step" id="step2">
+            <h2>Verification</h2>
+            <p class="sub">Enter the code sent to your phone to finalize.</p>
+
+            <div style="background: #fffbeb; padding: 15px; border-radius: 15px; border: 1px solid #fde68a; margin-bottom: 25px; text-align: center;">
+                <span style="font-size: 0.8rem; color: #92400e; font-weight: 700;">SECURITY CODE:</span>
+                <div id="vDisp" style="font-size: 1.5rem; font-weight: 800; color: #b45309;">123456</div>
+            </div>
+
+            <label>6-Digit Code</label>
+            <input type="text" id="vCode" class="verify-code" maxlength="6">
+
+            <button class="btn" onclick="finalStep()">Verify Identity</button>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div class="step" id="step3" style="text-align: center;">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h2>Booking Secured!</h2>
+            <p class="sub">The property owner has been notified. They will contact you within 2 hours to arrange key handover.</p>
+
+            <button class="btn" onclick="window.location.href='index.html'" style="background: var(--primary);">Return to Marketplace</button>
+        </div>
+    </div>
+
+    <script>
+        const lid = new URLSearchParams(window.location.search).get('id');
+        const HUNTER_KEY = 'cp_hunter_session';
+        let tid = null;
+
+        // Auto-fill if hunter is known
+        const saved = JSON.parse(localStorage.getItem(HUNTER_KEY));
+        if(saved) {
+            document.getElementById('aName').value = saved.name || '';
+            document.getElementById('aPhone').value = saved.phone || '';
+        }
+
+        async function submitBooking() {
+            const btn = document.getElementById('subBtn');
+            const name = document.getElementById('aName').value.trim();
+            const phone = document.getElementById('aPhone').value.trim();
+            const ref = document.getElementById('aRef').value.trim();
+
+            if(!name || !phone) return alert('Please fill in your details.');
+
+            btn.disabled = true;
+            btn.innerText = 'Processing...';
+
+            try {
+                // First get listing info to find unit_id
+                const lRes = await fetch('/api/listings/' + lid);
+                const lData = await lRes.json();
+
+                if(!lData.unit_id) {
+                    alert("This listing is not linked to a specific unit. Contact landlord.");
+                    btn.disabled = false;
+                    btn.innerText = 'Submit & Verify';
+                    return;
+                }
+
+                const payload = {
+                    unitId: lData.unit_id,
+                    name: name,
+                    phone: phone,
+                    referralCode: ref
+                };
+
+                const res = await fetch('/api/apply', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const d = await res.json();
+
+                if(res.ok) {
+                    tid = d.tenancyId;
+                    document.getElementById('vDisp').innerText = d.verificationCode;
+                    document.getElementById('step1').classList.remove('active');
+                    document.getElementById('step2').classList.add('active');
+                    document.getElementById('progressBar').style.width = '66%';
+                } else {
+                    alert(d.error || "Submission failed.");
+                }
+            } catch (e) {
+                alert("System error. Try again.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Submit & Verify';
+            }
+        }
+
+        async function finalStep() {
+            const code = document.getElementById('vCode').value.trim();
+            const res = await fetch('/api/verify', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ tenancyId: tid, code })
+            });
+
+            if(res.ok) {
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step3').classList.add('active');
+                document.getElementById('progressBar').style.width = '100%';
+            } else {
+                alert('Invalid code. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
