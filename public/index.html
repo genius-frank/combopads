@@ -73,6 +73,13 @@
     </div>
 
     <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => console.log('Empire App Ready')).catch(err => console.log('SW failed', err));
+            });
+        }
+
         async function load() {
             const grid = document.getElementById('mainGrid');
             const res = await fetch(`/api/listings?search=${document.getElementById('sLoc').value}&maxPrice=${document.getElementById('sMax').value}`);
