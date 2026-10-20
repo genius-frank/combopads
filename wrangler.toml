@@ -1,0 +1,7 @@
+name = "combopads"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./public"
+
+[vars]
+NODE_VERSION = "18"
+SETUP_KEY = "baraka-setup-2026"

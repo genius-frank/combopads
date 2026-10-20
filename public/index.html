@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ComboPads Empire — Premium Real Estate</title>
+    <title>ComboPads Empire — Premium Real Estate & AI PropTech</title>
     <link rel="manifest" href="manifest.json">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         .logo span { color: var(--secondary); }
         .btn-dark { background: var(--primary); color: white; padding: 12px 24px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 0.9rem; }
 
-        .hero { background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center; padding: 80px 24px 140px; text-align: center; color: white; }
+        .hero { background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center; padding: 80px 24px 140px; text-align: center; color: white; }
         .hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -2px; }
 
         .search-container { max-width: 1000px; margin: -60px auto 0; padding: 0 20px; position: relative; z-index: 10; }
@@ -25,6 +25,10 @@
         .s-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; }
         .s-group input, .s-group select { width: 100%; padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; border-radius: 15px; outline: none; font-size: 1rem; }
         .btn-search { background: var(--secondary); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; cursor: pointer; height: 58px; font-size: 1rem; }
+
+        .ai-banner { max-width: 1000px; margin: 40px auto 20px; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; border-radius: 30px; padding: 35px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25); border: 2px solid #38bdf8; display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: center; }
+        @media (max-width: 800px) { .ai-banner { grid-template-columns: 1fr; text-align: center; } }
+        .ai-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 800; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.4); }
 
         .container { max-width: 1200px; margin: 50px auto; padding-bottom: 100px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 35px; }
@@ -55,7 +59,7 @@
 
     <header class="hero">
         <h1>Find Your Freedom.</h1>
-        <p>The premium marketplace for verified rentals across Kenya's elite neighborhoods.</p>
+        <p>The premium marketplace for verified rentals & AI proptech across Kenya.</p>
     </header>
 
     <div class="search-container">
@@ -64,6 +68,29 @@
             <div class="s-group"><label>Type</label><select id="sCat"><option value="ALL">All Categories</option><option value="HOUSE">Houses</option><option value="LAND">Lands</option></select></div>
             <div class="s-group"><label>Budget</label><input type="number" id="sMax" placeholder="KSh"></div>
             <button class="btn-search" onclick="load()">Search</button>
+        </div>
+    </div>
+
+    <!-- FUTURISTIC AI ENGINE INTERACTIVE WIDGET -->
+    <div class="ai-banner">
+        <div>
+            <div class="ai-badge"><i class="fas fa-microchip"></i> TITAN AI PROPTECH ENGINE v9.1</div>
+            <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 10px;">Instant AI Rent & Credit Safety Predictor</h2>
+            <p style="opacity: 0.85; font-size: 0.95rem; line-height: 1.5;">Test our AI engine! Enter location and monthly income to compute instant fair market value, occupancy odds, and your cryptographic credit risk score.</p>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.07); padding: 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15);">
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #38bdf8;">Location</label>
+                <input type="text" id="aiLoc" value="Westlands, Nairobi" style="width: 100%; padding: 10px; border-radius: 10px; border: none; background: #0f172a; color: white; margin-top: 4px; outline: none;">
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #38bdf8;">Your Monthly Income (KSh)</label>
+                <input type="number" id="aiInc" value="75000" style="width: 100%; padding: 10px; border-radius: 10px; border: none; background: #0f172a; color: white; margin-top: 4px; outline: none;">
+            </div>
+            <button onclick="runAiPredictor()" style="width: 100%; padding: 12px; background: linear-gradient(90deg, #38bdf8, #818cf8); border: none; border-radius: 12px; color: white; font-weight: 800; cursor: pointer;">
+                <i class="fas fa-bolt"></i> Run AI Analysis
+            </button>
+            <div id="aiOut" style="margin-top: 15px; font-size: 0.85rem; display: none; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px;"></div>
         </div>
     </div>
 
@@ -80,20 +107,52 @@
             });
         }
 
+        async function runAiPredictor() {
+            const loc = document.getElementById('aiLoc').value;
+            const inc = document.getElementById('aiInc').value;
+            const out = document.getElementById('aiOut');
+            out.style.display = 'block';
+            out.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating AI Market Yield & Credit Safety...';
+
+            try {
+                const resVal = await fetch('/api/ai/predict-rent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ location: loc, bedrooms: 1, amenities: ['Security', 'Borehole', 'Parking'] })
+                });
+                const dVal = await resVal.json();
+
+                const resRisk = await fetch('/api/ai/lease-risk-score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ monthlyRent: dVal.predictedPrice, income: inc, pastExcusesCount: 0 })
+                });
+                const dRisk = await resRisk.json();
+
+                out.innerHTML = `
+                    <div style="color:#34d399; font-weight:800;">✨ Market Estimate: KSh ${Number(dVal.predictedPrice).toLocaleString()}/mo</div>
+                    <div style="color:#38bdf8; margin-top:4px;">🛡️ AI Credit Score: <strong>${dRisk.score}/100</strong> (${dRisk.tier})</div>
+                    <div style="opacity:0.8; font-size:0.75rem; margin-top:4px;">Seal: ${dRisk.aiSeal}</div>
+                `;
+            } catch (e) {
+                out.innerHTML = 'AI Engine offline. Make sure local server is running.';
+            }
+        }
+
         async function load() {
             const grid = document.getElementById('mainGrid');
             const res = await fetch(`/api/listings?search=${document.getElementById('sLoc').value}&maxPrice=${document.getElementById('sMax').value}`);
             const data = await res.json();
             grid.innerHTML = '';
             data.forEach(l => {
-                const currentUrl = encodeURIComponent(`https://combopads.onrender.com/listing.html?id=${l.id}`);
+                const currentUrl = encodeURIComponent(`https://combopads.pages.dev/listing.html?id=${l.id}`);
                 const shareText = encodeURIComponent(`Check out this house on ComboPads: ${l.title} in ${l.location} for KSh ${l.price}`);
 
                 grid.innerHTML += `
                     <div class="h-card">
                         <img src="${l.cover_photo || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'}" class="h-img">
                         <div class="h-info">
-                            <div class="trust-badge"><i class="fas fa-check-circle"></i> VERIFIED BY COMBOPADS</div>
+                            <div class="trust-badge"><i class="fas fa-shield-alt"></i> VERIFIED BY COMBOPADS TITAN ENGINE</div>
                             <div class="h-price">KSh ${Number(l.price).toLocaleString()}</div>
                             <h3 class="h-title" style="font-size:1.2rem; font-weight:700;">${l.title}</h3>
                             <p style="color:#64748b; font-size:0.85rem; margin-top:5px;">📍 ${l.location}</p>

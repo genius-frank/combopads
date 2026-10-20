@@ -4,22 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ComboPads — My Plot Portal</title>
-    <link rel="manifest" href="manifest.json">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #0f172a; --secondary: #3b82f6; --accent: #10b981; --bg: #f8fafc; --text: #1e293b; --white: #ffffff; }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
         body { background-color: var(--bg); color: var(--text); min-height: 100vh; }
-
         header { background: var(--primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .logo { font-weight: 900; font-size: 1.4rem; color: white; text-decoration: none; }
         .btn-logout { color: #94a3b8; background: none; border: none; cursor: pointer; font-weight: 800; font-size: 0.8rem; }
-
         .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-        .card { background: white; padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f1f5f9; animation: fadeIn 0.4s ease-out; }
+        .card { background: white; padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f1f5f9; animation: fadeIn 0.4s ease-out; position: relative; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        .broadcast-bar { background: #fee2e2; border: 2px solid #ef4444; padding: 15px 25px; border-radius: 15px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; color: #b91c1c; font-weight: 700; }
         .status-pill { display: inline-block; padding: 8px 18px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
         .status-active { background: #d1fae5; color: #065f46; }
         .status-debt { background: #fef2f2; color: #b91c1c; border: 2px solid #fee2e2; }
@@ -28,33 +26,44 @@
         .btn { padding: 12px 30px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
         .btn-p { background: var(--accent); color: white; }
         .btn-sec { background: var(--secondary); color: white; }
+        .btn-danger { background: #ef4444; color: white; }
 
         .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 30px; }
-        .feature-btn { background: white; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; cursor: pointer; text-align: center; transition: 0.3s; }
+        .feature-btn { background: white; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; cursor: pointer; text-align: center; transition: 0.3s; height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .feature-btn:hover:not(.locked) { transform: translateY(-5px); border-color: var(--secondary); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .feature-btn.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .feature-btn i { font-size: 2rem; color: var(--secondary); margin-bottom: 10px; display: block; }
-        .feature-btn span { font-weight: 700; display: block; }
+        .feature-btn i { font-size: 2rem; color: var(--secondary); margin-bottom: 10px; }
+        .feature-btn span { font-weight: 700; }
+
+        .req-item { padding: 20px; border-radius: 15px; border: 1px solid #f1f5f9; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .req-status { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .status-red { background: #ef4444; box-shadow: 0 0 10px #f87171; }
+        .status-green { background: #10b981; box-shadow: 0 0 10px #34d399; }
 
         input, select, textarea { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 15px; outline: none; background: #f8fafc; font-size: 1rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid #f1f5f9; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #f1f5f9; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
 
         #authArea { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 6000; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 500px; padding: 40px; border-radius: 30px; }
+        .toggle-btn { background: none; border: none; color: var(--secondary); font-weight: 800; cursor: pointer; text-decoration: underline; margin-top: 15px; display: block; }
     </style>
 </head>
 <body>
     <div id="authArea">
         <div class="card" style="width:400px; text-align:center;">
-            <h1>Plot Login</h1>
-            <input type="text" id="lPhone" placeholder="Phone (254...)">
-            <input type="text" id="lPlot" placeholder="Plot ID (prop_...)">
+            <h1>Resident Login</h1>
+            <input type="text" id="lPhone" placeholder="Phone 254...">
+            <input type="text" id="lPlot" placeholder="Plot Logon ID">
             <button class="btn btn-sec" style="width:100%" onclick="login()">Enter My Plot</button>
+            <button class="toggle-btn" onclick="toggleReq()">Request Access</button>
         </div>
     </div>
 
     <div id="mainArea" class="container" style="display:none;">
+        <div id="announcementBox"></div>
         <header style="background:none; color:inherit; padding:0; margin-bottom:30px;">
             <div>
                 <div id="badge"></div>
@@ -65,36 +74,47 @@
         </header>
 
         <div id="payRow" class="rent-alert" style="display:none;">
-            <div><h3 style="color:#92400e;">Monthly Rent Due</h3><p>Please pay by the 6th to avoid lockouts.</p></div>
-            <button class="btn btn-p" onclick="pay()">Pay KSh <span id="rem"></span></button>
+            <div><h3 style="color:#92400e;">Monthly Rent Due</h3><p>Avoid account locking by paying before the 6th.</p></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-p" onclick="pay()">Pay KSh <span id="rem"></span></button>
+                <button class="btn btn-danger" onclick="openDecline()">Decline</button>
+            </div>
         </div>
 
         <div class="feature-grid">
-            <div class="feature-btn" id="f1" onclick="go('repair')"><i class="fas fa-wrench"></i><span>Repairs</span></div>
-            <div class="feature-btn" id="f2" onclick="go('history')"><i class="fas fa-file-invoice-dollar"></i><span>Rent History</span></div>
-            <div class="feature-btn" id="f3" onclick="go('bills')"><i class="fas fa-faucet"></i><span>Utility Bills</span></div>
-            <div class="feature-btn" id="f4" onclick="go('switch')"><i class="fas fa-exchange-alt"></i><span>Switch Room</span></div>
-            <div class="feature-btn" id="f5" onclick="go('vacate')"><i class="fas fa-door-open"></i><span>Give Notice</span></div>
+            <div class="feature-btn" id="f1" onclick="go('repair')"><i class="fas fa-tools"></i><span>Repairs</span></div>
+            <div class="feature-btn" id="f2" onclick="go('history')"><i class="fas fa-history"></i><span>History</span></div>
+            <div class="feature-btn" id="f3" onclick="go('bills')"><i class="fas fa-faucet"></i><span>Utilities</span></div>
+            <div class="feature-btn" id="f4" onclick="go('switch')"><i class="fas fa-exchange-alt"></i><span>Switch</span></div>
+            <div class="feature-btn" id="f5" onclick="go('vacate')"><i class="fas fa-door-open"></i><span>Notice</span></div>
         </div>
         <div id="vArea" style="margin-top:30px;"></div>
     </div>
 
-    <script>
-        let data = null;
-        const TOKEN_KEY = 'at_p';
+    <!-- Decline Modal -->
+    <div id="declineModal" class="modal"><div class="modal-content">
+        <h2>Unable to pay?</h2>
+        <p style="margin-bottom:20px;">Help the landlord understand your situation.</p>
+        <div style="text-align:left; margin-bottom:20px;">
+            <label><input type="checkbox" class="decR" value="Salary Delay"> Salary Delay</label><br>
+            <label><input type="checkbox" class="decR" value="Medical Bill"> Medical Bill</label><br>
+            <label><input type="checkbox" class="decR" value="Emergency"> Other Emergency</label>
+        </div>
+        <textarea id="decDetails" placeholder="Add more details..."></textarea>
+        <button class="btn btn-danger" style="width:100%" onclick="submitDecline()">Send Excuse</button>
+        <button class="toggle-btn" style="width:100%; text-align:center" onclick="closeModals()">Cancel</button>
+    </div></div>
 
+    <script>
+        let data = null; const KEY = 'at_p';
         async function login() {
-            const phone = document.getElementById('lPhone').value.trim();
-            const plotId = document.getElementById('lPlot').value.trim();
-            const res = await fetch('/api/tenant/plot-login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({phone, plotId}) });
+            const res = await fetch('/api/tenant/plot-login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({phone:document.getElementById('lPhone').value, plotId:document.getElementById('lPlot').value}) });
             const d = await res.json();
-            if(res.ok) { localStorage.setItem(TOKEN_KEY, d.token); init(); }
-            else alert(d.error);
+            if(res.ok) { localStorage.setItem(KEY, d.token); init(); } else alert(d.error);
         }
 
         async function init() {
-            const token = localStorage.getItem(TOKEN_KEY);
-            if(!token) return;
+            const token = localStorage.getItem(KEY); if(!token) return;
             const res = await fetch('/api/tenant/plot-status', { headers:{Authorization:`Bearer ${token}`} });
             data = await res.json();
             document.getElementById('authArea').style.display='none';
@@ -102,61 +122,47 @@
             document.getElementById('greet').innerText = `Hello, ${data.full_name}`;
             document.getElementById('sub').innerText = `${data.plot_name} — Room ${data.unit_number}`;
 
+            if(data.announcement) {
+                document.getElementById('announcementBox').innerHTML = `<div class="broadcast-bar"><i class="fas fa-bullhorn"></i> <span>${data.announcement.text}</span></div>`;
+            }
+
             if(data.balance > 0) {
-                document.getElementById('badge').innerHTML = '<span class="status-pill status-debt">Account Locked (Debt)</span>';
+                document.getElementById('badge').innerHTML = '<span class="status-pill status-debt">Account Locked</span>';
                 document.getElementById('payRow').style.display='flex';
                 document.getElementById('rem').innerText = data.balance.toLocaleString();
                 ['f1','f4','f5'].forEach(id => document.getElementById(id).classList.add('locked'));
             } else {
-                document.getElementById('badge').innerHTML = '<span class="status-pill status-active">Verified Resident</span>';
-                document.getElementById('payRow').style.display='none';
+                document.getElementById('badge').innerHTML = '<span class="status-pill status-active">Paid Up</span>';
             }
         }
 
         async function go(v) {
-            if(data.balance > 0 && ['repair','switch','vacate'].includes(v)) return alert('Access Denied: Clear arrears first!');
+            if(data.balance > 0 && ['repair','switch','vacate'].includes(v)) return alert('Clear arrears first!');
             const a = document.getElementById('vArea');
-            const token = localStorage.getItem(TOKEN_KEY);
+            const h = { headers: { Authorization: `Bearer ${localStorage.getItem(KEY)}` } };
 
-            if(v==='repair') {
-                a.innerHTML = `<div class="card"><h3>Report Damage</h3><select id="cat"><option>PLUMBING</option><option>ELECTRICAL</option><option>WATER/LEAKAGE</option></select><textarea id="desc" placeholder="Describe the issue..."></textarea><button class="btn btn-sec" onclick="sendR()">Send Request</button></div>`;
-            }
+            if(v==='repair') a.innerHTML = `<div class="card"><h3>Report Issue</h3><select id="cat"><option>PLUMBING</option><option>ELECTRICAL</option></select><textarea id="desc" placeholder="Details..."></textarea><button class="btn btn-sec" onclick="sendR()">Send</button></div>`;
             else if(v==='history') {
-                const payments = await (await fetch('/api/tenant/payments', { headers:{Authorization:`Bearer ${token}`} })).json();
-                a.innerHTML = `<div class="card"><h3>Rent History</h3><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${payments.map(p => `<tr><td>${new Date(p.recorded_at).toLocaleDateString()}</td><td>KSh ${p.amount.toLocaleString()}</td><td>✅ SUCCESS</td></tr>`).join('') || '<tr><td colspan="3">No history.</td></tr>'}</table></div>`;
+                const payments = await (await fetch('/api/tenant/payments', h)).json();
+                a.innerHTML = `<div class="card"><h3>Payments</h3><table>${payments.map(p=>`<tr><td>${new Date(p.recorded_at).toLocaleDateString()}</td><td>KSh ${p.amount}</td><td>✅</td></tr>`).join('') || 'No history.'}</table></div>`;
             }
             else if(v==='bills') {
-                const bills = await (await fetch('/api/tenant/bills', { headers:{Authorization:`Bearer ${token}`} })).json();
-                a.innerHTML = `<div class="card"><h3>Utility Bills</h3><table><tr><th>Month</th><th>Type</th><th>Units</th><th>Amount</th><th>Status</th></tr>${bills.map(b => `<tr><td>${b.billing_month}</td><td>${b.type}</td><td>${b.curr_reading || '-'}</td><td>KSh ${b.amount.toLocaleString()}</td><td>${b.status}</td></tr>`).join('') || '<tr><td colspan="5">No bills found.</td></tr>'}</table></div>`;
+                const bills = await (await fetch('/api/tenant/bills', h)).json();
+                a.innerHTML = `<div class="card"><h3>Bills</h3><table>${bills.map(b=>`<tr><td>${b.type}</td><td>KSh ${b.amount}</td><td>${b.status}</td></tr>`).join('') || 'No bills.'}</table></div>`;
             }
-            else if(v==='switch') {
-                a.innerHTML = `<div class="card"><h3>Room Switch Request</h3><input id="toU" placeholder="Target Room No."><textarea id="swR" placeholder="Reason..."></textarea><button class="btn btn-sec" onclick="sendS()">Submit Switch</button></div>`;
-            }
-            else if(v==='vacate') {
-                a.innerHTML = `<div class="card"><h3>Give Vacate Notice</h3><p class="sub">30 days notice is required.</p><input type="date" id="vDate"><textarea id="vReason" placeholder="Reason for leaving..."></textarea><button class="btn btn-danger" onclick="sendV()">Submit Notice</button></div>`;
-            }
+            else if(v==='switch') a.innerHTML = `<div class="card"><h3>Room Switch</h3><input id="toU" placeholder="Move to room..."><textarea id="swR" placeholder="Reason..."></textarea><button class="btn btn-sec" onclick="sendS()">Request</button></div>`;
         }
 
-        async function sendR() {
-            await fetch('/api/tenant/maintenance', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(TOKEN_KEY)}`}, body:JSON.stringify({tenancyId:data.id, category:document.getElementById('cat').value, description:document.getElementById('desc').value}) });
-            alert('Reported!'); location.reload();
+        async function sendR() { await fetch('/api/tenant/maintenance', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({tenancyId:data.id, category:document.getElementById('cat').value, description:document.getElementById('desc').value}) }); alert('Sent!'); location.reload(); }
+        async function sendS() { await fetch('/api/tenant/request-switch', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({tenancyId:data.id, fromUnit:data.unit_number, toUnit:document.getElementById('toU').value, reason:document.getElementById('swR').value}) }); alert('Request Sent!'); location.reload(); }
+        async function pay() { fetch('/api/pay/stk-push', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({amount:data.balance, tenancyId:data.id}) }).then(r=>r.json()).then(d=>alert(d.message)); }
+        async function submitDecline() {
+            const reasons = Array.from(document.querySelectorAll('.decR:checked')).map(c=>c.value).join(', ');
+            await fetch('/api/tenant/decline-payment', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(KEY)}`}, body:JSON.stringify({tenancyId:data.id, reason:reasons, details:document.getElementById('decDetails').value}) });
+            alert('Excuse Sent!'); closeModals();
         }
-
-        async function sendS() {
-            await fetch('/api/tenant/request-switch', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(TOKEN_KEY)}`}, body:JSON.stringify({tenancyId:data.id, fromUnit:data.unit_number, toUnit:document.getElementById('toU').value, reason:document.getElementById('swR').value}) });
-            alert('Switch Request Sent!'); location.reload();
-        }
-
-        async function sendV() {
-            await fetch('/api/tenant/request-vacate', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(TOKEN_KEY)}`}, body:JSON.stringify({tenancyId:data.id, vacateDate:document.getElementById('vDate').value, reason:document.getElementById('vReason').value}) });
-            alert('Notice Submitted!'); location.reload();
-        }
-
-        async function pay() {
-            const res = await fetch('/api/pay/stk-push', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem(TOKEN_KEY)}`}, body:JSON.stringify({amount:data.balance, tenancyId:data.id}) });
-            alert((await res.json()).message);
-        }
-
+        function openDecline() { document.getElementById('declineModal').style.display='flex'; }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
         function logout() { localStorage.clear(); location.reload(); }
         init();
     </script>

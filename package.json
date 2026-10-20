@@ -1,18 +1,17 @@
 {
-  "name": "combopads",
+  "name": "student-hub",
   "version": "1.0.0",
-  "description": "Multi-tenant real estate platform for house hunting and property management.",
-  "main": "src/server.js",
+  "description": "Course notes, community feed, events, and attachment leads board for a diploma cohort",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
-    "bcryptjs": "^2.4.3",
-    "path": "^0.12.7"
-  },
-  "author": "Francis Empire",
-  "license": "ISC"
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7",
+    "bcrypt": "^5.1.1",
+    "express-session": "^1.18.0",
+    "dotenv": "^16.4.5"
+  }
 }

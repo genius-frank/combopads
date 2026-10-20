@@ -2,7 +2,6 @@ node_modules/
 *.db
 *.db-shm
 *.db-wal
+.env
 .idea/
-package-lock.json
-index.accdb
-xvba_excel_backup/
+.vscode/
