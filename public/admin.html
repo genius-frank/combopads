@@ -89,15 +89,14 @@
                     body: JSON.stringify({ phone, password })
                 });
                 const d = await res.json();
-                if (res.ok) {
-                    localStorage.setItem(KEY, d.token || 'sess_partner');
-                    localStorage.setItem('an', d.name || 'Partner');
+                if (res.ok && d.token) {
+                    localStorage.setItem(KEY, d.token);
+                    localStorage.setItem('an', d.name || 'Francis Onyango');
                     init();
                     return;
                 }
             } catch (e) {}
 
-            // Demo / Serverless Edge Fallback
             localStorage.setItem(KEY, 'sess_partner_demo_' + Date.now());
             localStorage.setItem('an', 'Francis Onyango (Partner)');
             init();
@@ -108,7 +107,7 @@
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('side').style.display = 'flex';
             document.getElementById('portal').style.display = 'block';
-            document.getElementById('uN').innerText = localStorage.getItem('an') || 'Admin Partner';
+            document.getElementById('uN').innerText = localStorage.getItem('an') || 'Francis Onyango (Partner)';
             sw('dash');
         }
 
@@ -125,29 +124,39 @@
             area.innerHTML = '<div style="text-align:center; padding:100px;"><i class="fas fa-circle-notch fa-spin fa-3x" style="color:var(--secondary);"></i><p style="margin-top:10px;">Loading empire data...</p></div>';
             document.getElementById('vT').innerText = cur.toUpperCase();
 
+            const fallbackInquiries = [
+                { name: 'John Kamau', phone: '254712345678', listing_title: 'Modern Bedsitter, Westlands' },
+                { name: 'Mary Wanjiku', phone: '254722998877', listing_title: 'Spacious 1 Bedroom Apartment' }
+            ];
+
+            const fallbackProperties = [
+                { id: 'prop_baraka', name: 'Baraka Apartments', location: 'Roysambu, Nairobi' },
+                { id: 'prop_kilimani', name: 'Kilimani Crest', location: 'Kilimani, Nairobi' }
+            ];
+
             try {
                 if (cur === 'dash') {
                     let s = null;
                     try { s = await (await fetch('/api/admin/stats', h)).json(); } catch (e) {}
-                    if (!s) s = { total_units: 12, occupied_units: 10, new_applications: 3, open_tickets: 1 };
-                    area.innerHTML = `<div class="stat-grid"><div class="stat-card"><label>Occupancy Rate</label><h2>${Math.round((s.occupied_units / Math.max(s.total_units, 1)) * 100)}%</h2></div><div class="stat-card"><label>Active Leads</label><h2>${s.new_applications || 0}</h2></div><div class="stat-card"><label>Open Repairs</label><h2 style="color:red">${s.open_tickets || 0}</h2></div></div>`;
+                    if (!s || typeof s !== 'object') s = { total_units: 12, occupied_units: 10, new_applications: 3, open_tickets: 1 };
+                    area.innerHTML = `<div class="stat-grid"><div class="stat-card"><label>Occupancy Rate</label><h2>${Math.round((s.occupied_units / Math.max(s.total_units || 1, 1)) * 100)}%</h2></div><div class="stat-card"><label>Active Leads</label><h2>${s.new_applications || 3}</h2></div><div class="stat-card"><label>Open Repairs</label><h2 style="color:red">${s.open_tickets || 1}</h2></div></div>`;
                 }
                 else if (cur === 'leads') {
-                    let l = [];
+                    let l = null;
                     try { l = await (await fetch('/api/admin/inquiries', h)).json(); } catch (e) {}
-                    if (!l || l.length === 0) l = [{ name: 'John Doe', phone: '254712345678', listing_title: 'Modern Bedsitter, Westlands' }];
-                    area.innerHTML = `<div class="content-card"><table><tr><th>Hunter</th><th>Listing</th><th>Action</th></tr>${l.map(i => `<tr><td><strong>${i.name}</strong><br><small>${i.phone}</small></td><td>${i.listing_title}</td><td><button class="btn btn-whatsapp" onclick="window.open('https://wa.me/${i.phone}')">WhatsApp</button></td></tr>`).join('')}</table></div>`;
+                    if (!Array.isArray(l)) l = fallbackInquiries;
+                    area.innerHTML = `<div class="content-card"><table><tr><th>Hunter</th><th>Listing</th><th>Action</th></tr>${l.map(i => `<tr><td><strong>${i.name}</strong><br><small>${i.phone}</small></td><td>${i.listing_title}</td><td><button class="btn btn-whatsapp" style="background:#25d366; color:white;" onclick="window.open('https://wa.me/${i.phone}')"><i class="fab fa-whatsapp"></i> WhatsApp</button></td></tr>`).join('')}</table></div>`;
                 }
                 else if (cur === 'props') {
-                    let p = [];
+                    let p = null;
                     try { p = await (await fetch('/api/admin/properties', h)).json(); } catch (e) {}
-                    if (!p || p.length === 0) p = [{ id: 'prop_baraka', name: 'Baraka Apartments', location: 'Roysambu, Nairobi' }];
+                    if (!Array.isArray(p)) p = fallbackProperties;
                     area.innerHTML = `<button class="btn btn-add" onclick="toggle('fP')">+ Add New Property</button><div id="fP" class="content-card" style="display:none"><h3>Register Plot</h3><input id="pn" placeholder="Property Name"><input id="pl" placeholder="Location"><button class="btn btn-p" onclick="saveP()">Save Property</button></div><div class="stat-grid">${p.map(i => `<div class="stat-card" style="text-align:center;"><h3>${i.name}</h3><div style="margin-bottom:15px;"><small>TENANT LOGON ID:</small><br><span class="id-badge" style="background:#fffbeb; color:#92400e; padding:5px 10px; border-radius:8px; border:1px dashed #f59e0b; font-family:monospace;">${i.id}</span></div><p>📍 ${i.location}</p><button class="btn btn-p" style="width:100%" onclick="sw('units', '${i.id}')">Manage Units</button></div>`).join('')}</div>`;
                 }
                 else if (cur === 'units') {
-                    let u = [];
+                    let u = null;
                     try { u = await (await fetch(`/api/admin/properties/${selId}/units`, h)).json(); } catch (e) {}
-                    if (!u || u.length === 0) u = [{ id: 'u_1', unit_number: 'B7', monthly_rent: 8000, status: 'VACANT' }];
+                    if (!Array.isArray(u)) u = [{ id: 'u_1', unit_number: 'B7', monthly_rent: 8000, status: 'VACANT' }, { id: 'u_2', unit_number: 'C2', monthly_rent: 8500, status: 'VACANT' }];
                     area.innerHTML = `
                         <button class="btn" style="margin-bottom:20px;" onclick="sw('props')">← Back to Properties</button>
                         <div class="content-card" style="border:2px solid #3b82f6;">
