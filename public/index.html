@@ -50,10 +50,10 @@
 </head>
 <body>
     <nav>
-        <a href="index.html" class="logo"><i class="fas fa-cube"></i> Combo<span>Pads</span></a>
+        <a href="/" class="logo"><i class="fas fa-cube"></i> Combo<span>Pads</span></a>
         <div class="nav-actions">
-            <a href="onboard.html" class="btn-dark" style="background:none; color:var(--text); margin-right:10px;">List Property</a>
-            <a href="tenant.html" class="btn-dark">Sign In</a>
+            <a href="/onboard" class="btn-dark" style="background:none; color:var(--text); margin-right:10px;">List Property</a>
+            <a href="/tenant" class="btn-dark">Sign In</a>
         </div>
     </nav>
 
@@ -175,7 +175,7 @@
 
             grid.innerHTML = '';
             data.forEach(l => {
-                const currentUrl = encodeURIComponent(`https://combopads.pages.dev/listing.html?id=${l.id}`);
+                const currentUrl = encodeURIComponent(`https://combopads.pages.dev/listing?id=${l.id}`);
                 const shareText = encodeURIComponent(`Check out this house on ComboPads: ${l.title} in ${l.location} for KSh ${l.price}`);
 
                 grid.innerHTML += `
@@ -188,8 +188,8 @@
                             <p style="color:#64748b; font-size:0.85rem; margin-top:5px;">📍 ${l.location}</p>
 
                             <div class="btn-group">
-                                <button class="btn-sm btn-view" onclick="location.href='listing.html?id=${l.id}'">Explore</button>
-                                <button class="btn-sm btn-view" style="background:var(--secondary);" onclick="location.href='listing.html?id=${l.id}&ask=1'">Inquire</button>
+                                <button class="btn-sm btn-view" onclick="location.href='/listing?id=${l.id}'">Explore</button>
+                                <button class="btn-sm btn-view" style="background:var(--secondary);" onclick="location.href='/listing?id=${l.id}&ask=1'">Inquire</button>
                             </div>
 
                             <button class="btn-sm btn-share" onclick="window.open('https://api.whatsapp.com/send?text=${shareText}%20${currentUrl}')">
